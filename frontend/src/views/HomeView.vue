@@ -3,7 +3,7 @@
         <div class="row">
             <div class="col-9">
                 <div class="row mb-3">
-                    <UserProfileWrite v-if="$store.state.user.is_login"  />
+                    <UserProfileWrite v-if="is_me" @post_a_post="post_a_post" />
                 </div>
                 <div class="row">
                     <UserProfilePosts :user="user" :posts="posts" @delete_a_post="delete_a_post" />
@@ -21,8 +21,7 @@ import { reactive } from 'vue';
 import UserProfilePosts from '@/components/UserProfilePosts.vue';
 import ConTentBase from '../components/ContentBase.vue';
 import UserProfileWrite from '../components/UserProfileWrite.vue';
-import UserBoard from '@/components/UserBoard.vue';
-
+import UserBoard from '@/components/UserBoard.vue'; 
 export default {
     name: 'HomeView',
     components: {
@@ -41,6 +40,7 @@ export default {
                 { id: 5, content: '这是第五条帖子' , userimage: 'https://img.shetu66.com/2023/07/27/1690436791750269.png'},
             ],
         });
+
 
 
         return {

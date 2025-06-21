@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+
+  <!--
+    settings 元素包含重要的设置，它们会改变 MyBatis 的运行时行为。
+    这些设置通常是全局性的。
+  -->
+  <settings>
+    <!-- 开启驼峰命名自动映射：将数据库表的下划线命名（如 user_name）自动映射到 Java 实体类的驼峰命名（如 userName）。 -->
+    <setting name="mapUnderscoreToCamelCase" value="true"/>
+    <!-- 允许 JDBC 支持生成主键，如果你的数据库支持，并且你使用了 insert 语句返回自增主键。 -->
+    <setting name="useGeneratedKeys" value="true"/>
+    <!-- 允许在嵌套查询中使用缓存。 -->
+    <setting name="useColumnLabel" value="true"/>
+    <!-- 开启二级缓存（如果需要）。默认是开启的，但这里显式声明。 -->
+    <setting name="cacheEnabled" value="true"/>
+    <!-- 指定当结果集中包含 null 值时 JDBC 应该使用的方法。 -->
+    <setting name="jdbcTypeForNull" value="NULL"/>
+    <!-- 打印SQL语句到控制台（在开发环境很有用，生产环境慎用或通过日志框架控制）。 -->
+    <!-- 通常通过 logging.level.org.mybatis: DEBUG 在 application.yml 中控制更方便。 -->
+    <!-- <setting name="logImpl" value="STDOUT_LOGGING"/> -->
+  </settings>
+
+  <!--
+    typeAliases 元素用于为 Java 类型定义简短的名称。
+    这在 XML 映射文件中引用 Java 类型时非常有用，可以减少冗余的完全限定名。
+  -->
+  <typeAliases>
+    <package name="com.blog.backend.entity"/>
+  </typeAliases>
+<!--  <environments default="development">-->
+<!--    <environment id="development">-->
+<!--      <transactionManager type="JDBC"/>-->
+<!--      <dataSource type="POOLED">-->
+<!--        <property name="driver" value="com.mysql.cj.jdbc.Driver"/>-->
+<!--        <property name="url" value="jdbc:mysql://localhost:3306/BondingMonster?useUnicode=true&amp;characterEncoding=utf8&amp;serverTimezone=UTC"/>-->
+<!--        <property name="username" value="root"/>-->
+<!--        <property name="password" value="@Aa123456"/>-->
+<!--         <property name="poolMaximumActiveConnections" value="10"/>-->
+<!--         <property name="poolMaximumIdleConnections" value="5"/>-->
+<!--      </dataSource>-->
+<!--    </environment>-->
+<!--  </environments>-->
+
+  <mappers>
+    <mapper resource="com/blog/backend/mapper/UserMapper.xml"/>
+  </mappers>
+
+
+
+</configuration>

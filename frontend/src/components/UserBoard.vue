@@ -20,20 +20,38 @@
 </template>
 
 <script>
-// import { ref } from 'vue';
+import { reactive } from 'vue';
+import $ from 'jquery';
+import config from '@/config';
+const API_BASE_URL = config.API_BASE_URL;
 
 export default {
   name: 'UserBoard',
   setup() {
-    // const topUsers = ref([]);
-    const topUsers = [
+    const topUsers = reactive({
+      topUsers:[
         { id: 1, username: '用户A', rank: 1, image: 'https://img.shetu66.com/2023/07/27/1690436791750269.png' },
         { id: 2, username: '用户B', rank: 2, image: 'https://img.shetu66.com/2023/07/27/1690436791750269.png' },
         { id: 3, username: '用户C', rank: 3, image: 'https://img.shetu66.com/2023/07/27/1690436791750269.png' },
         { id: 4, username: '用户D', rank: 4, image: 'https://img.shetu66.com/2023/07/27/1690436791750269.png' },
         { id: 5, username: '用户E', rank: 5, image: 'https://img.shetu66.com/2023/07/27/1690436791750269.png' },
-        ];
+      ]
+    });
 
+    $.ajax({
+        url: `${API_BASE_URL}/api/user/topUsers/`,
+        type: 'GET',
+        success(response) {
+            if (response.status === 'success') {
+                topUsers.posts = response.data;
+            } else {
+                alert('获取热门帖子失败，请稍后再试。');
+            }
+        },
+        error() {
+            alert('网络错误，请稍后再试。');
+        }
+    });
     return {
         topUsers,
     }

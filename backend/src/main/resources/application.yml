@@ -1,0 +1,84 @@
+# =========================================
+# Spring Boot Application Configuration
+# =========================================
+spring:
+  application:
+    name: backend # 你的应用名称
+
+  # =========================================
+  # Spring Data Source (MySQL) Configuration
+  # =========================================
+  datasource:
+    url: jdbc:mysql://localhost:3306/BondingMonster?useUnicode=true&characterEncoding=utf8&serverTimezone=UTC&useSSL=false
+    username: root
+    password: "@Aa123456"
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    # HikariCP 连接池配置 (Spring Boot 默认)
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      idle-timeout: 30000 # 30 seconds
+      connection-timeout: 30000 # 30 seconds
+      max-lifetime: 1800000 # 30 minutes
+
+  # =========================================
+  # MyBatis Configuration
+  # =========================================
+  mybatis:
+    config-location: classpath:mybatis-config.xml # 指定 MyBatis 核心配置文件位置
+    mapper-locations: classpath:mapper/*.xml #
+
+  # =========================================
+  # Spring Data Redis Configuration
+  # =========================================
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password: # 如果Redis有密码，请在这里填写
+      timeout: 5000ms # 连接超时时间
+      lettuce:
+        pool:
+          max-active: 8 # 连接池最大连接数
+          max-idle: 8   # 连接池最大空闲连接数
+          min-idle: 0   # 连接池最小空闲连接数
+          max-wait: 10000ms # 连接池最大阻塞等待时间
+
+  # =========================================
+  # Spring AMQP (RabbitMQ) Configuration
+  # =========================================
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest # 替换为你的RabbitMQ用户名
+    password: guest # 替换为你的RabbitMQ密码
+    virtual-host: / # 默认的虚拟主机
+    listener:
+      simple:
+        concurrency: 1 # 最小消费者数量
+        max-concurrency: 5 # 最大消费者数量
+
+# =========================================
+# Server Configuration
+# =========================================
+server:
+  port: 8080 # 应用运行端口
+
+# =========================================
+# JWT Configuration (Custom Properties)
+# =========================================
+jwt:
+  secret: your_jwt_secret_key_that_is_at_least_256_bits_long # 替换为你的JWT密钥，至少32个字符的随机字符串
+  access-token-expiration: 300000 # Access Token 有效期 (毫秒), 5分钟
+  refresh-token-expiration: 604800000 # Refresh Token 有效期 (毫秒), 7天
+
+# =========================================
+# Logging Configuration (Optional, for more detailed control)
+# =========================================
+logging:
+  level:
+    root: INFO
+    org.springframework.web: INFO
+    org.springframework.security: DEBUG # 调试Spring Security相关问题时可以开启
+    com.yourcompany.app: DEBUG # 你的应用包下的日志级别
+    org.mybatis: DEBUG # 打印MyBatis SQL语句
