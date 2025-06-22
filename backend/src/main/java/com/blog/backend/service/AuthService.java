@@ -64,12 +64,6 @@ public class AuthService {
     public String refreshAccessToken(String refreshToken) {
         if (jwtUtil.validateRefreshToken(refreshToken)) {
             Long userId = jwtUtil.getUserIdFromToken(refreshToken);
-            // 进一步验证 refresh token 是否在 Redis 中有效 (防止被盗用或重复使用)
-            // 这里需要根据你存储 refresh token 的具体策略来验证
-            // 简单的验证：检查 Redis 中是否存在该 refresh token 的键
-            // 更安全的做法：在 Redis 中存储 refresh token 的 JTI，并在使用后将其标记为已使用或删除
-            // 为了简化，这里假设只要 JWT 本身有效，就允许刷新
-            // 实际生产中，你需要更严谨的 refresh token 管理机制
 
             // 检查用户是否存在
             User user = userMapper.selectById(userId);

@@ -21,7 +21,7 @@ public class UserController {
 
     /**
      * 获取用户信息
-     * URL: /myspace/getinfo/
+     * URL: /myspace/getinfo
      * Method: GET
      * Query Params: user_id
      * Headers: Authorization: Bearer <access_token>
@@ -36,17 +36,19 @@ public class UserController {
             response.put("photo", user.getPhoto());
             response.put("followerCount", user.getFollowerCount());
             // 注意：不要返回密码等敏感信息
+            System.out.println(response);
             return ResponseEntity.ok(response);
         } else {
             Map<String, Object> errorResponse = new HashMap<>();
             errorResponse.put("error", "User not found");
+            System.out.println(errorResponse);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
         }
     }
 
     /**
      * 获取用户榜单
-     * URL: /api/user/topUsers/
+     * URL: /api/user/topUsers
      * Method: GET
      */
     @GetMapping("/api/user/topUsers")
