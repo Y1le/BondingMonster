@@ -1,6 +1,7 @@
 package com.blog.backend.util;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -8,181 +9,94 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 
 import jakarta.annotation.PostConstruct;
 
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
+
 @Component
 public class JwtUtil {
+    public static final long JWT_TTL = 5 * 60 * 1000L ;  // 5分钟
+    public static final long RJWT_TTL = 60 * 60 * 1000L * 24 * 14 ;  // 14天
+    public static final String JWT_KEY = "JSDFSDFSDFASJDHASDASDdfa32dJHASFDA67765asda123";
 
-    @Value("${jwt.secret}")
-    private String secret;
-
-    @Value("${jwt.access-token-expiration}")
-    private long accessTokenExpiration; // 毫秒
-
-    @Value("${jwt.refresh-token-expiration}")
-    private long refreshTokenExpiration; // 毫秒
-
-    private Key key; // 用于签名和验证 JWT 的密钥
-
-    /**
-     * 在 bean 初始化后执行，用于生成密钥
-     */
-    @PostConstruct
-    public void init() {
-        // 使用 Keys.hmacShaKeyFor 从 secret 字符串生成 HMAC-SHA 密钥
-        this.key = Keys.hmacShaKeyFor(secret.getBytes());
+    public static String getUUID() {
+        return UUID.randomUUID().toString().replaceAll("-", "");
     }
 
-    /**
-     * 生成 Access Token
-     * @param userId 用户ID
-     * @param username 用户名
-     * @return Access Token 字符串
-     */
-    public String generateAccessToken(Long userId, String username) {
-        return generateToken(userId, username, accessTokenExpiration);
+    public static String createJWT(String subject) {
+        JwtBuilder builder = getJwtBuilder(subject, null, getUUID());
+        return builder.compact();
     }
 
-    /**
-     * 生成 Refresh Token
-     * @param userId 用户ID
-     * @param username 用户名 (通常 Refresh Token 中不需要用户名，但为了通用性可以保留)
-     * @return Refresh Token 字符串
-     */
-    public String generateRefreshToken(Long userId, String username) {
-        return generateToken(userId, username, refreshTokenExpiration);
+    public static String createRJWT(String subject) {
+        // 刷新令牌的ID也可以用于在数据库中进行存储和验证，以实现吊销功能
+        String uuid = getUUID();
+        JwtBuilder builder = getJwtBuilder(subject, RJWT_TTL, uuid);
+        return builder.compact();
+
     }
 
-    /**
-     * 通用方法：生成 JWT Token
-     * @param userId 用户ID
-     * @param username 用户名
-     * @param expiration 有效期 (毫秒)
-     * @return JWT Token 字符串
-     */
-    private String generateToken(Long userId, String username, long expiration) {
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("userId", userId);
-        claims.put("username", username); // 将用户名也放入 claims
+    private static JwtBuilder getJwtBuilder(String subject, Long ttlMillis, String uuid) {
+        SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
+        SecretKey secretKey = generalKey();
+        long nowMillis = System.currentTimeMillis();
+        Date now = new Date(nowMillis);
+        if (ttlMillis == null) {
+            ttlMillis = JwtUtil.JWT_TTL;
+        }
 
+        long expMillis = nowMillis + ttlMillis;
+        Date expDate = new Date(expMillis);
         return Jwts.builder()
-                .setClaims(claims) // 设置自定义 claims
-                .setIssuedAt(new Date(System.currentTimeMillis())) // 设置签发时间
-                .setExpiration(new Date(System.currentTimeMillis() + expiration)) // 设置过期时间
-                .signWith(key, SignatureAlgorithm.HS256) // 使用密钥和算法签名
-                .compact(); // 压缩成 JWT 字符串
+                .setId(uuid)
+                .setSubject(subject)
+                .setIssuer("sg")
+                .setIssuedAt(now)
+                .signWith(signatureAlgorithm, secretKey)
+                .setExpiration(expDate);
     }
 
     /**
-     * 从 Token 中提取所有 Claims
-     * @param token JWT Token 字符串
-     * @return Claims 对象
+     * 从刷新令牌中获取用户主题 (Subject)
+     * @param refreshToken 刷新令牌
+     * @return 用户主题 (通常是用户ID)
+     * @throws Exception 如果令牌无效或解析失败
      */
-    public Claims extractAllClaims(String token) {
+    public static String getSubjectFromRefreshToken(String refreshToken) throws Exception {
+        Claims claims = parseJWT(refreshToken);
+        return claims.getSubject();
+    }
+
+    /**
+     * 刷新访问令牌
+     * @param refreshToken 客户端提供的刷新令牌
+     * @return 新的访问令牌
+     * @throws Exception 如果刷新令牌无效或过期
+     */
+    public static String refreshAccessToken(String refreshToken) throws Exception {
+
+        Claims claims = parseJWT(refreshToken);
+
+        String subject = claims.getSubject();
+
+        return createJWT(subject);
+    }
+
+    public static SecretKey generalKey() {
+        byte[] encodeKey = Base64.getDecoder().decode(JwtUtil.JWT_KEY);
+        return new SecretKeySpec(encodeKey, 0, encodeKey.length, "HmacSHA256");
+    }
+
+    public static Claims parseJWT(String jwt) throws Exception {
+        SecretKey secretKey = generalKey();
         return Jwts.parser()
-                .setSigningKey(key) // 设置签名密钥
+                .setSigningKey(secretKey)
                 .build()
-                .parseClaimsJws(token) // 解析 JWT
-                .getBody(); // 获取 Claims 部分
-    }
-
-    /**
-     * 从 Token 中提取特定 Claim
-     * @param token JWT Token 字符串
-     * @param claimsResolver 用于从 Claims 中提取特定值的函数
-     * @param <T> 期望的返回值类型
-     * @return 提取到的值
-     */
-    public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
-        final Claims claims = extractAllClaims(token);
-        return claimsResolver.apply(claims);
-    }
-
-    /**
-     * 从 Token 中获取用户ID
-     * @param token JWT Token 字符串
-     * @return 用户ID
-     */
-    public Long getUserIdFromToken(String token) {
-        // 使用 extractClaim 方法，传入一个 lambda 表达式来获取 userId
-        return extractClaim(token, claims -> claims.get("userId", Long.class));
-    }
-
-    /**
-     * 从 Token 中获取用户名
-     * @param token JWT Token 字符串
-     * @return 用户名
-     */
-    public String getUsernameFromToken(String token) {
-        // 使用 extractClaim 方法，传入一个 lambda 表达式来获取 username
-        return extractClaim(token, claims -> claims.get("username", String.class));
-    }
-
-    /**
-     * 从 Token 中获取过期时间
-     * @param token JWT Token 字符串
-     * @return 过期时间 Date 对象
-     */
-    public Date getExpirationDateFromToken(String token) {
-        return extractClaim(token, Claims::getExpiration);
-    }
-
-    /**
-     * 判断 Token 是否过期
-     * @param token JWT Token 字符串
-     * @return 如果 Token 已过期则返回 true，否则返回 false
-     */
-    private Boolean isTokenExpired(String token) {
-        final Date expiration = getExpirationDateFromToken(token);
-        return expiration.before(new Date());
-    }
-
-    /**
-     * 验证 Access Token 是否有效且未过期
-     * @param token Access Token 字符串
-     * @return 如果 Token 有效且未过期则返回 true，否则返回 false
-     */
-    public Boolean validateAccessToken(String token) {
-        try {
-            // 尝试解析 Token，如果解析失败（如签名无效、Token格式错误），会抛出异常
-            extractAllClaims(token);
-            // 如果解析成功，再检查是否过期
-            return !isTokenExpired(token);
-        } catch (Exception e) {
-            // Token 解析失败或签名无效，视为无效 Token
-            // logger.warn("Access Token validation failed: " + e.getMessage()); // 可以在这里添加日志
-            return false;
-        }
-    }
-
-    /**
-     * 验证 Refresh Token 是否有效且未过期
-     * @param token Refresh Token 字符串
-     * @return 如果 Token 有效且未过期则返回 true，否则返回 false
-     */
-    public Boolean validateRefreshToken(String token) {
-        try {
-            // 尝试解析 Token
-            extractAllClaims(token);
-            // 检查是否过期
-            return !isTokenExpired(token);
-        } catch (Exception e) {
-            // Refresh Token 解析失败或签名无效
-            // logger.warn("Refresh Token validation failed: " + e.getMessage()); // 可以在这里添加日志
-            return false;
-        }
-    }
-
-    public long getAccessTokenExpiration() {
-        return accessTokenExpiration;
-    }
-
-    public long getRefreshTokenExpiration() {
-        return refreshTokenExpiration;
+                .parseClaimsJws(jwt)
+                .getBody();
     }
 }

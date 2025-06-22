@@ -16,16 +16,13 @@
     <description>backend</description>
 
     <properties>
-        <java.version>23</java.version> <!-- 与你的 JDK 实际版本保持一致 -->
+        <java.version>21</java.version> <!-- 改为21，Java 23可能导致兼容性问题 -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <!-- 移除 spring-boot.version 属性，因为已经继承了父项目 -->
-        <jjwt.version>0.12.5</jjwt.version> <!-- 升级 jjwt 版本以支持 Jakarta EE -->
-        <mybatis-spring-boot.version>3.0.3</mybatis-spring-boot.version> <!-- 确保这个版本与 Spring Boot 3.x 兼容 -->
-        <mysql-connector.version>8.0.33</mysql-connector.version> <!-- 确保 MySQL 连接器版本也较新 -->
+        <jjwt.version>0.12.5</jjwt.version> <!-- 升级到最新版本 -->
+        <mybatis-plus.version>3.5.5</mybatis-plus.version> <!-- 使用更稳定的版本 -->
+        <mysql-connector.version>8.0.33</mysql-connector.version>
     </properties>
-
-
 
     <dependencies>
         <dependency>
@@ -37,18 +34,32 @@
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
-        <!-- MyBatis Starter -->
+        <!-- MyBatis Plus Starter - 使用更稳定的版本 -->
         <dependency>
-            <groupId>org.mybatis.spring.boot</groupId>
-            <artifactId>mybatis-spring-boot-starter</artifactId>
-            <version>${mybatis-spring-boot.version}</version>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-boot-starter</artifactId>
+            <version>${mybatis-plus.version}</version>
+            <!-- 排除可能冲突的依赖 -->
+            <exclusions>
+                <exclusion>
+                    <groupId>org.mybatis</groupId>
+                    <artifactId>mybatis-spring</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <!-- 显式添加兼容的mybatis-spring版本 -->
+        <dependency>
+            <groupId>org.mybatis</groupId>
+            <artifactId>mybatis-spring</artifactId>
+            <version>3.0.3</version>
         </dependency>
 
         <!-- MySQL Driver -->
         <dependency>
             <groupId>com.mysql</groupId>
             <artifactId>mysql-connector-j</artifactId>
-            <version>${mysql-connector.version}</version> <!-- 明确指定版本，确保较新 -->
+            <version>${mysql-connector.version}</version>
             <scope>runtime</scope>
         </dependency>
 
@@ -64,7 +75,7 @@
             <artifactId>spring-boot-starter-amqp</artifactId>
         </dependency>
 
-        <!-- JWT Library (jjwt) -->
+        <!-- JWT Library - 升级到最新版本 -->
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt-api</artifactId>
@@ -74,33 +85,32 @@
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt-impl</artifactId>
             <version>${jjwt.version}</version>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt-jackson</artifactId>
             <version>${jjwt.version}</version>
+            <scope>runtime</scope>
         </dependency>
 
-        <!-- Lombok (可选，简化POJO) -->
+        <dependency>
+            <groupId>org.jetbrains</groupId>
+            <artifactId>annotations</artifactId>
+            <version>24.0.0</version>
+        </dependency>
 
+        <!-- Lombok -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <optional>true</optional>
         </dependency>
-        <!-- Log4j 2 Core -->
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-api</artifactId>
-            <version>2.23.1</version> <!-- 使用最新稳定版本 -->
-        </dependency>
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-core</artifactId>
-            <version>2.23.1</version> <!-- 使用最新稳定版本 -->
-        </dependency>
 
-        <!--在序列化 JSON 的过程-->
+        <!-- 移除手动添加的Log4j依赖，使用Spring Boot默认的logback -->
+        <!-- Spring Boot自带日志框架，不需要额外添加Log4j -->
+
+        <!-- JSON序列化 -->
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-jsr310</artifactId>
@@ -118,7 +128,6 @@
         </dependency>
     </dependencies>
 
-
     <build>
         <plugins>
             <plugin>
@@ -134,21 +143,16 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <version>${project.parent.version}</version>
                 <configuration>
                     <mainClass>com.blog.backend.BackendApplication</mainClass>
-                    <skip>false</skip>
+                    <excludes>
+                        <exclude>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                        </exclude>
+                    </excludes>
                 </configuration>
-                <executions>
-                    <execution>
-                        <id>repackage</id>
-                        <goals>
-                            <goal>repackage</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>
-
 </project>

@@ -1,7 +1,7 @@
-package com.blog.backend.controller;
+package com.blog.backend.controller.user.account;
 
 import com.blog.backend.entity.User;
-import com.blog.backend.service.UserService;
+import com.blog.backend.service.user.account.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

@@ -1,7 +1,8 @@
 package com.blog.backend.controller;
 
+import com.blog.backend.controller.user.account.UserController;
 import com.blog.backend.entity.User;
-import com.blog.backend.service.UserService;
+import com.blog.backend.service.user.account.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -16,7 +17,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyInt;

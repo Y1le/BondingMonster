@@ -1,5 +1,4 @@
 import $ from 'jquery';
-import jwt_decode from 'jwt-decode';
 import config from '@/config';
 const API_BASE_URL = config.API_BASE_URL;
 const ModuleUser = {
@@ -28,6 +27,7 @@ const ModuleUser = {
           state.access = access;
       },
       logout(state) {
+          console.log("Logout");
           state.id = "";
           state.username = "";
           state.photo = "";
@@ -40,36 +40,40 @@ const ModuleUser = {
   actions: {
       login(context, data) {
         $.ajax({
-            url: `${API_BASE_URL}/api/token/`,
+            url: `${API_BASE_URL}/api/token`,
             type: "POST",
-            data: {
+            contentType: "application/json",
+            data: JSON.stringify({
                 username: data.username,
                 password: data.password,
-            },
-            success(resp) {
-                const {access, refresh} = resp;
-                const access_obj = jwt_decode(access);
+            }),
+            success(response) {
+                console.log("Login success");
+                console.log(response);
+                const {access, refresh} = response;
 
                 setInterval(() => {
                     $.ajax({
-                        url: `${API_BASE_URL}/api/token/refresh/`,
+                        url: `${API_BASE_URL}/api/token/refresh`,
                         type: "POST",
-                        data: {
+                        contentType: "application/json", // <--- 明确指定 Content-Type
+                        data: JSON.stringify({
                             refresh,
-                        },
-                        success(resp) {
-                            context.commit('updateAccess', resp.access);
+                        }),
+                        success(response) {
+                            context.commit('updateAccess', response.access);
                         }
                     });
                 }, 4.5 * 60 * 1000);
+                
                 $.ajax({
-                    url: `${API_BASE_URL}/myspace/getinfo/`,
+                    url: `${API_BASE_URL}/myspace/getinfo`,
                     type: "GET",
                     data: {
-                        user_id: access_obj.user_id,
+                        user_id: response.id,
                     },
                     headers: {
-                        'Authorization': "Bearer " + access,
+                        'Authorization': "Bearer " + response.access,
                     },
                     success(response) {
                         context.commit("updateUser", {
@@ -84,15 +88,16 @@ const ModuleUser = {
             },
             error() {
                 data.error();
-                context.commit("updateUser", {
-                    id:1,
-                    username: "mockUser",
-                    photo: "https://img.shetu66.com/2023/07/27/1690436791750269.png",
-                    followerCount: 0,
-                    access: "mock_access_token",
-                    refresh: "mock_refresh_token",
-                    is_login: true,
-                });
+                // console.error("Login failed");
+                // context.commit("updateUser", {
+                //     id:1,
+                //     username: "mockUser",
+                //     photo: "https://img.shetu66.com/2023/07/27/1690436791750269.png",
+                //     followerCount: 0,
+                //     access: "mock_access_token",
+                //     refresh: "mock_refresh_token",
+                //     is_login: true,
+                // });
             }
         });
 

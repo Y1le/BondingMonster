@@ -1,8 +1,8 @@
-package com.blog.backend.controller;
+package com.blog.backend.controller.user.account;
 
 import com.blog.backend.controller.DTO.LoginRequest;
 import com.blog.backend.controller.DTO.RefreshTokenRequest;
-import com.blog.backend.service.AuthService;
+import com.blog.backend.service.user.account.AuthService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,7 +24,7 @@ public class AuthController {
      * 用户登录
      * URL: /api/token/
      * Method: POST
-     * Request Body: username, password
+     * Request Body: username, password, id
      */
     @PostMapping("/token")
     public ResponseEntity<Map<String, String>> login(@RequestBody LoginRequest loginRequest) {
@@ -40,6 +40,10 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
         }
     }
+
+
+
+
 
     /**
      * 刷新 Access Token

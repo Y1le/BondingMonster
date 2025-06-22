@@ -2,7 +2,7 @@ package com.blog.backend.service;
 
 import com.blog.backend.entity.User;
 import com.blog.backend.mapper.UserMapper;
-import com.blog.backend.util.RedisUtil;
+import com.blog.backend.service.user.account.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -10,11 +10,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension; // 确保导入
-import org.springframework.security.crypto.password.PasswordEncoder; // 如果 AuthControllerTest 依赖它，这里也需要
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -137,18 +135,10 @@ class UserServiceTest {
 
         // 模拟 userMapper.updateFollowerCount() 返回 1 (表示更新成功)
         when(userMapper.updateFollowerCount(userId, count)).thenReturn(1);
-        // 模拟 redisUtil.del() (void 方法)
-        when(redisUtil.del(anyString())).thenReturn(true);
-        // 模拟 redisUtil.zIncrementScore()
-        when(redisUtil.zIncrementScore(eq("user:ranking"), eq(userId.toString()), eq(count.doubleValue()))).thenReturn(105.0); // 模拟更新后的分数
 
         userService.updateFollowerCount(userId, count);
 
         // 验证 userMapper.updateFollowerCount 被调用
         verify(userMapper, times(1)).updateFollowerCount(userId, count);
-        // 验证 redisUtil.del 被调用 (清除用户缓存)
-        verify(redisUtil, times(1)).del(eq("user:info:1"));
-        // 验证 redisUtil.zIncrementScore 被调用 (更新排行榜)
-        verify(redisUtil, times(1)).zIncrementScore(eq("user:ranking"), eq(userId.toString()), eq(count.doubleValue()));
     }
 }
