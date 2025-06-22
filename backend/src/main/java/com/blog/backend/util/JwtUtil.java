@@ -21,7 +21,13 @@ import javax.crypto.spec.SecretKeySpec;
 public class JwtUtil {
     public static final long JWT_TTL = 5 * 60 * 1000L ;  // 5分钟
     public static final long RJWT_TTL = 60 * 60 * 1000L * 24 * 14 ;  // 14天
-    public static final String JWT_KEY = "JSDFSDFSDFASJDHASDASDdfa32dJHASFDA67765asda123";
+
+    // 方法一：使用Base64编码的密钥（推荐）
+    // 这是一个256位的密钥，已经用Base64编码
+    public static final String JWT_KEY = "MySecretKeyForJWTTokenGenerationAndValidation1234567890ABCDEF";
+
+    // 或者使用这个已经Base64编码的密钥
+    // public static final String JWT_KEY = "TXlTZWNyZXRLZXlGb3JKV1RUb2tlbkdlbmVyYXRpb25BbmRWYWxpZGF0aW9uMTIzNDU2Nzg5MEFCQ0RFRg==";
 
     public static String getUUID() {
         return UUID.randomUUID().toString().replaceAll("-", "");
@@ -37,7 +43,6 @@ public class JwtUtil {
         String uuid = getUUID();
         JwtBuilder builder = getJwtBuilder(subject, RJWT_TTL, uuid);
         return builder.compact();
-
     }
 
     private static JwtBuilder getJwtBuilder(String subject, Long ttlMillis, String uuid) {
@@ -78,18 +83,41 @@ public class JwtUtil {
      * @throws Exception 如果刷新令牌无效或过期
      */
     public static String refreshAccessToken(String refreshToken) throws Exception {
-
         Claims claims = parseJWT(refreshToken);
-
         String subject = claims.getSubject();
-
         return createJWT(subject);
     }
 
+    // 方法一：直接使用字符串作为密钥（适用于固定密钥）
     public static SecretKey generalKey() {
-        byte[] encodeKey = Base64.getDecoder().decode(JwtUtil.JWT_KEY);
-        return new SecretKeySpec(encodeKey, 0, encodeKey.length, "HmacSHA256");
+        // 直接使用字符串的字节作为密钥，确保长度足够
+        byte[] keyBytes = JWT_KEY.getBytes();
+
+        // 如果密钥长度不足32字节，进行填充
+        if (keyBytes.length < 32) {
+            keyBytes = Arrays.copyOf(keyBytes, 32);
+        }
+
+        return new SecretKeySpec(keyBytes, 0, 32, "HmacSHA256");
     }
+
+    // 如果您想使用Base64编码的密钥，请取消下面方法的注释并注释上面的方法
+    /*
+    public static SecretKey generalKey() {
+        try {
+            // 如果JWT_KEY是Base64编码的字符串
+            byte[] encodeKey = Base64.getDecoder().decode(JWT_KEY);
+            return new SecretKeySpec(encodeKey, 0, encodeKey.length, "HmacSHA256");
+        } catch (IllegalArgumentException e) {
+            // 如果Base64解码失败，直接使用字符串字节
+            byte[] keyBytes = JWT_KEY.getBytes();
+            if (keyBytes.length < 32) {
+                keyBytes = Arrays.copyOf(keyBytes, 32);
+            }
+            return new SecretKeySpec(keyBytes, 0, 32, "HmacSHA256");
+        }
+    }
+    */
 
     public static Claims parseJWT(String jwt) throws Exception {
         SecretKey secretKey = generalKey();
@@ -98,5 +126,11 @@ public class JwtUtil {
                 .build()
                 .parseClaimsJws(jwt)
                 .getBody();
+    }
+
+    // 辅助方法：生成新的Base64编码密钥（仅用于开发时生成新密钥）
+    public static String generateNewBase64Key() {
+        SecretKey key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+        return Base64.getEncoder().encodeToString(key.getEncoded());
     }
 }

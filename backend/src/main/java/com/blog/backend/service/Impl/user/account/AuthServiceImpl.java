@@ -57,7 +57,7 @@ public class AuthServiceImpl implements AuthService {
             String access = JwtUtil.createJWT(user.getId().toString());
             String refresh = JwtUtil.createRJWT(user.getId().toString());
 
-            result.put("success", "true"); // 认证成功标志
+//            result.put("success", "true"); // 认证成功标志
             result.put("access", access);
             result.put("refresh", refresh);
             result.put("id", String.valueOf(user.getId()));
@@ -65,13 +65,13 @@ public class AuthServiceImpl implements AuthService {
         } catch (AuthenticationException e) {
             // 认证失败，Spring Security 会抛出 AuthenticationException 及其子类
             // 例如：BadCredentialsException (密码错误), UsernameNotFoundException (用户不存在)
-            result.put("success", "false"); // 认证失败标志
+//            result.put("success", "false"); // 认证失败标志
             result.put("message", e.getMessage()); // 返回具体的错误信息
             // 打印堆栈跟踪以便调试，但在生产环境中可能需要更优雅的错误处理
             e.printStackTrace();
         } catch (Exception e) {
             // 捕获其他可能的异常，例如 ClassCastException 如果 UserDetailsImpl 没有正确返回
-            result.put("success", "false");
+//            result.put("success", "false");
             result.put("message", "登录过程中发生未知错误: " + e.getMessage());
             e.printStackTrace();
         }
