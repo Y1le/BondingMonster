@@ -1,7 +1,5 @@
 package com.blog.backend.Config;
 
-import com.blog.backend.filter.JwtAuthenticationFilter;
-import com.blog.backend.service.AuthService;
 import com.blog.backend.util.RedisUtil;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

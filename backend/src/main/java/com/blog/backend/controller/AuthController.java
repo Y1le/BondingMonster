@@ -1,5 +1,7 @@
 package com.blog.backend.controller;
 
+import com.blog.backend.controller.DTO.LoginRequest;
+import com.blog.backend.controller.DTO.RefreshTokenRequest;
 import com.blog.backend.service.AuthService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +27,10 @@ public class AuthController {
      * Request Body: username, password
      */
     @PostMapping("/token")
-    public ResponseEntity<Map<String, String>> login(@RequestParam String username, @RequestParam String password) {
+    public ResponseEntity<Map<String, String>> login(@RequestBody LoginRequest loginRequest) {
+        String username = loginRequest.getUsername();
+        String password = loginRequest.getPassword();
+
         Map<String, String> tokens = authService.login(username, password);
         if (tokens != null) {
             return ResponseEntity.ok(tokens);
@@ -43,7 +48,8 @@ public class AuthController {
      * Request Body: refresh
      */
     @PostMapping("/token/refresh")
-    public ResponseEntity<Map<String, String>> refreshToken(@RequestParam String refresh) {
+    public ResponseEntity<Map<String, String>> refreshToken(@RequestBody RefreshTokenRequest refreshTokenRequest) {
+        String refresh = refreshTokenRequest.getRefresh();
         String newAccessToken = authService.refreshAccessToken(refresh);
         if (newAccessToken != null) {
             Map<String, String> response = new HashMap<>();

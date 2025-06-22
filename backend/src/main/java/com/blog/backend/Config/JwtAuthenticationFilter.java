@@ -1,4 +1,4 @@
-package com.blog.backend.filter;
+package com.blog.backend.Config;
 
 import com.blog.backend.util.JwtUtil;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -29,16 +29,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
-        // 1. 检查请求路径是否是公共路径 (permitAll() 的路径)
-        // 这些路径不应该被 JWT 过滤器拦截或强制要求 JWT
-        String requestUri = request.getRequestURI();
-        if (requestUri.startsWith("/api/token") || // 匹配 /api/token 和 /api/token/refresh
-                requestUri.equals("/myspace/getinfo") || // 如果这个也需要公开访问
-                requestUri.equals("/api/user/topUsers")) { // 如果这个也需要公开访问
-            filterChain.doFilter(request, response);
-            return; // 直接放行，不执行后续的 JWT 验证逻辑
-        }
-
         // 2. 只有当请求不是公共路径时，才尝试解析和验证 JWT
         final String authorizationHeader = request.getHeader("Authorization");
 
@@ -52,11 +42,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 username = jwtUtil.getUsernameFromToken(jwt);
                 userId = jwtUtil.getUserIdFromToken(jwt);
             } catch (Exception e) {
-                // JWT 解析失败或过期，记录警告但不要阻止过滤器链继续
-                // Spring Security 的 ExceptionTranslationFilter 会处理认证失败
                 logger.warn("JWT Token is invalid or expired: " + e.getMessage());
-                // 如果这里不设置认证信息，后续的 authenticated() 规则会拒绝请求
-                // 对于需要认证的路径，如果JWT无效，这里不设置认证信息是正确的行为
             }
         }
 
