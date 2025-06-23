@@ -6,6 +6,7 @@ const ModuleUser = {
     id: "",
     username: "",
     photo: "",
+    randingCount: 0, // EnglistDanceGame 的排位分数
     followerCount: 0,
     access: "",
     refresh: "",
@@ -18,6 +19,7 @@ const ModuleUser = {
           state.id = user.id;
           state.username = user.username;
           state.photo = user.photo;
+          state.randingCount = user.rankdingCount;
           state.followerCount = user.followerCount;
           state.access = user.access;
           state.refresh = user.refresh;
@@ -31,6 +33,7 @@ const ModuleUser = {
           state.id = "";
           state.username = "";
           state.photo = "";
+          state.randingCount = 0;
           state.followerCount = 0;
           state.access = "";
           state.refresh = "";
@@ -78,6 +81,7 @@ const ModuleUser = {
                     success(response) {
                         context.commit("updateUser", {
                             ...response,
+                            randingCount: response.rankdingCount || 0, // 兼容旧数据
                             access: access,
                             refresh: refresh,
                             is_login: true,
@@ -88,16 +92,16 @@ const ModuleUser = {
             },
             error() {
                 data.error();
-                // console.error("Login failed");
-                // context.commit("updateUser", {
-                //     id:1,
-                //     username: "mockUser",
-                //     photo: "https://img.shetu66.com/2023/07/27/1690436791750269.png",
-                //     followerCount: 0,
-                //     access: "mock_access_token",
-                //     refresh: "mock_refresh_token",
-                //     is_login: true,
-                // });
+                console.error("Login failed");
+                context.commit("updateUser", {
+                    id:1,
+                    username: "mockUser",
+                    photo: "https://img.shetu66.com/2023/07/27/1690436791750269.png",
+                    followerCount: 0,
+                    access: "mock_access_token",
+                    refresh: "mock_refresh_token",
+                    is_login: true,
+                });
             }
         });
 

@@ -66,4 +66,7 @@ export default {
 </script>
 
 <style scoped>
+.navbar {
+    background-color: rgba(95, 123, 216, 0.5) !important;
+}
 </style>
