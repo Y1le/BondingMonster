@@ -18,7 +18,7 @@ public class BackendApplicationTests {
     // 将密码加密和日志输出放在一个测试方法中
     @Test // 这是一个 JUnit 5 的测试方法
     void encodeAndLogPassword() {
-        String rawPassword = "testpass123";
+        String rawPassword = "123";
         String encodedPassword = passwordEncoder.encode(rawPassword);
 
         logger.info("原始密码: {}", rawPassword);

@@ -3,19 +3,15 @@
     <div class="row h-100 justify-content-center align-items-center">
         <div class="col-md-5 col-12 user-match-card">
             <div class="user-photo">
-                <img src="https://th.bing.com/th/id/OIP.H3ofruWZi8OgQskOyFmP9gAAAA?r=0&rs=1&pid=ImgDetMain&cb=idpwebp2&o=7&rm=3" alt="我的头像-加载失败">    
+                <img :src="$store.state.user.photo" alt="我的头像-加载失败">    
             </div>
-            <div class="user-name">我的名字</div>
+            <div class="user-name">{{$store.state.user.username}}</div>
         </div>
-        <!-- 图片中没有VS，所以这里不显示 -->
-        <!-- <div class="col-md-2 col-12 text-center vs-text d-none d-md-block">
-            VS
-        </div> -->
         <div class="col-md-5 col-12 user-match-card">
             <div class="user-photo opponent-photo">
-                <img src="https://th.bing.com/th/id/OIP.H3ofruWZi8OgQskOyFmP9gAAAA?r=0&rs=1&pid=ImgDetMain&cb=idpwebp2&o=7&rm=3" alt="对手图片-加载失败">    
+                <img :src="$store.state.englistdancegame.oppoent_photo" alt="对手图片-加载失败">    
             </div>
-            <div class="user-name opponent-name">对手</div>
+            <div class="user-name opponent-name">{{ $store.state.englistdancegame.oppoent_name }}</div>
         </div>
         <div class="col-12 text-center match-button-container">
             <button  @click="click_match_btn" type="button" class="btn match-action-btn">{{ match_btn_info }}</button>
@@ -25,25 +21,25 @@
 </template>
 
 <script>
-// import { useStore } from 'vuex';
+import { useStore } from 'vuex';
 import { ref } from 'vue';
 export default {
     name: 'MatchGround',
     setup() {
-        // const store = useStore(); // 如果需要，取消注释
-        let match_btn_info = ref("开始匹配"); // 初始状态为“开始匹配”
+        const store = useStore(); 
+        let match_btn_info = ref("开始匹配"); 
 
         const click_match_btn = () => {
             if (match_btn_info.value === "开始匹配") {
-                // store.state.englistdancegame.soket.send(JSON.stringify({
-                //     event:"start-matching",
-                // }));
+                store.state.englistdancegame.soket.send(JSON.stringify({
+                    event:"start-matching",
+                }));
                 match_btn_info.value = "取消匹配"; // 点击后变为“取消匹配”
             } else {
                 match_btn_info.value = "开始匹配"; // 点击后变为“开始匹配”
-                // store.state.englistdancegame.soket.send(JSON.stringify({
-                //     event:"stop-matching",
-                // }));
+                store.state.englistdancegame.soket.send(JSON.stringify({
+                    event:"stop-matching",
+                }));
             }
         }
         return {

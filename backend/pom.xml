@@ -116,10 +116,21 @@
             <artifactId>jackson-datatype-jsr310</artifactId>
         </dependency>
 
+        <!--  new 3.5.3    -->
         <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-websocket</artifactId>
+            <version>3.5.3</version>
         </dependency>
+
+        <!--old 2.0.11-->
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
+            <version>2.0.57</version>
+        </dependency>
+
+
 
         <dependency>
             <groupId>org.springframework.boot</groupId>

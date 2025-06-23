@@ -18,7 +18,7 @@ const ModuleEnglistDanceGame = {
     updateSocket(state, socket) {
       state.socket = socket;
     },
-    updateOppoentName(state, oppoent) {
+    updateOppoent(state, oppoent) {
       state.oppoent_name = oppoent.name;
       state.oppoent_photo = oppoent.photo;
     },
