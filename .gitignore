@@ -1,0 +1,39 @@
+# Ignore environment variables folder
+.env/
+
+# Java / Maven
+target/
+.idea/ # IntelliJ IDEA project files
+.vscode/ # VS Code project files
+*.iml # IntelliJ IDEA module files
+*.ipr
+*.iws
+.project
+.classpath
+.settings/
+
+# Maven wrapper
+.mvn/wrapper/maven-wrapper.jar
+
+# Gradle (if you use Gradle instead of Maven)
+.gradle/
+build/
+
+# Compiled class files
+*.class
+
+# Log files
+*.log
+logs/
+
+# Package files
+*.jar
+*.war
+*.ear
+*.zip
+*.tar.gz
+
+# IDE specific files
+*.swp
+*.bak
+*.tmp
