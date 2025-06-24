@@ -2,6 +2,7 @@ package com.blog.backend.controller.user.account;
 
 import com.blog.backend.controller.DTO.LoginRequest;
 import com.blog.backend.controller.DTO.RefreshTokenRequest;
+import com.blog.backend.controller.DTO.RegisterRequest;
 import com.blog.backend.service.user.account.AuthService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -64,5 +65,20 @@ public class AuthController {
             errorResponse.put("error", "Invalid refresh token");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
         }
+    }
+
+    /**
+     * 用户注册
+     * URL: /api/register/
+     * Method: POST
+     * Body: username, password
+     * Request Body: message
+     */
+    @PostMapping("/register")
+    public ResponseEntity<Map<String, String>> Register(@RequestBody RegisterRequest registerRequest) {
+        String username = registerRequest.getUsername();
+        String password = registerRequest.getPassword();
+
+        return ResponseEntity.ok(authService.register(username, password));
     }
 }

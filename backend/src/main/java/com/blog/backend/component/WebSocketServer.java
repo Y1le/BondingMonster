@@ -10,8 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArraySet;
 
 @Component
 @ServerEndpoint("/websocket/{token}")
@@ -33,19 +31,24 @@ public class WebSocketServer {
     }
 
     @OnClose
-    public void onClose(String message, Session session) {
-        System.out.println("receive message!");
-        JSONObject data = JSONObject.parseObject(message);
-        String event = data.getString("event");
-        if ("start-matching".equals(event)) {
-//            startMathing();
-        }else if ("stop-matching".equals(event)) {
-//            stopMatching();
-        }
+    public void onClose() {
+        System.out.println("disconnected!");
+
     }
 
     @OnMessage
-    public void onMessage(String message, Session session) {}
+    public void onMessage(String message, Session session) {
+//        System.out.println("receive message!");
+        JSONObject data = JSONObject.parseObject(message);
+        String event = data.getString("event");
+        if ("start-matching".equals(event)) {
+            System.out.println("start-matching");
+//            startMathing();
+        }else if ("stop-matching".equals(event)) {
+            System.out.println("stop-matching");
+//            stopMatching();
+        }
+    }
 
     @OnError
     public void onError(Session session,Throwable throwable) {
@@ -56,6 +59,7 @@ public class WebSocketServer {
         synchronized (this.session) {
             try {
                 this.session.getBasicRemote().sendText(message);
+
             } catch (IOException e) {
                 e.printStackTrace();
             }

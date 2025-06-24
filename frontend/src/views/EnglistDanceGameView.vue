@@ -30,13 +30,19 @@ export default {
 
             socket.onopen = () => {
                 console.log("connected to websocket server");
-                store.commit("updateSoket", socket);
+                store.commit("updateSocket", socket);
                 // console.log( socket);
             };
 
             socket.onmessage = msg => {
                 const data = JSON.parse(msg.date);
                 if (data.event === "matched") {
+                    store.commit("updateOppoent", {
+                        name: data.name,
+                        photo: data.photo,
+                    });
+                    store.commit("updateStatus", "playing");
+                }
             };
 
             socket.onclose = () => {

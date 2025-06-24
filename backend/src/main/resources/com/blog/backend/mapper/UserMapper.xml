@@ -20,12 +20,6 @@
         WHERE username = #{username}
     </select>
 
-    <select id="selectById" resultMap="UserResultMap">
-        SELECT id, username, password, photo, follower_count, create_time, update_time
-        FROM user
-        WHERE id = #{id}
-    </select>
-
     <insert id="insertUser" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO user (username, password, photo, follower_count, create_time, update_time)
         VALUES (#{username}, #{password}, #{photo}, #{followerCount}, #{createTime}, #{updateTime})

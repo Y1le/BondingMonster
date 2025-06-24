@@ -1,5 +1,6 @@
 import $ from 'jquery';
 import config from '@/config';
+import router from '@/router';
 const API_BASE_URL = config.API_BASE_URL;
 const ModuleUser = {
   state: {
@@ -38,6 +39,7 @@ const ModuleUser = {
           state.access = "";
           state.refresh = "";
           state.is_login = false;
+        router.push({ name: 'home' });
       }
   },
   actions: {
@@ -81,7 +83,7 @@ const ModuleUser = {
                     success(response) {
                         context.commit("updateUser", {
                             ...response,
-                            randingCount: response.rankdingCount || 0, // 兼容旧数据
+                            randingCount: response.rankdingCount|0, 
                             access: access,
                             refresh: refresh,
                             is_login: true,

@@ -1,5 +1,6 @@
 package com.blog.backend.service.Impl.user.account;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.blog.backend.entity.User;
 import com.blog.backend.service.Impl.utils.UserDetailsImpl; // 确保导入了正确的 UserDetailsImpl 包
 import com.blog.backend.service.user.account.AuthService;
@@ -11,7 +12,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException; // 导入 AuthenticationException
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -93,5 +97,59 @@ public class AuthServiceImpl implements AuthService {
             e.printStackTrace();
             return null;
         }
+    }
+
+    /**
+     * 用户注册
+     * @param username 用户名
+     * @param password 密码
+     * @retrun error_message
+     */
+
+    @Override
+    public Map<String, String> register(String username, String password){
+        Map<String, String> map = new HashMap<>();
+
+        if (username == null || username.length() == 0){
+            map.put("error_message", "username is empty");
+            return map;
+        }
+
+        if (username.length() < 3){
+            map.put("error_message", "username length must be longer than 3 size");
+            return map;
+        }
+
+        if (username.length() > 100){
+            map.put("error_message", "username length must be less than 100 size");
+            return map;
+        }
+
+        if (password.length() > 100) {
+            map.put("error_message", "password length must be less than 100 size");
+            return map;
+        }
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("username", username);
+        User user = userMapper.selectOne(queryWrapper);
+        if (user != null){
+            map.put("error_message", "username is exist");
+            return map;
+        }
+
+        String encodedPassword = passwordEncoder.encode(password);
+        user = new User(
+                null,
+                username,
+                encodedPassword,
+                "https://img.shetu66.com/2023/07/27/1690436791750269.png",
+                0,
+                LocalDateTime.now(),
+                LocalDateTime.now()
+        );
+        userMapper.insert(user);
+        map.put("error_message", "success");
+        return map;
+
     }
 }

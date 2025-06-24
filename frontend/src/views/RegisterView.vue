@@ -29,7 +29,8 @@ import { ref } from 'vue';
 import { useStore } from 'vuex';
 import router from '../router/index';
 import $ from 'jquery';
-
+import config from '@/config';
+const API_BASE_URL = config.API_BASE_URL;
 export default {
   name: 'RegisterView',
   components: {
@@ -48,42 +49,30 @@ export default {
         error_message.value = "两次密码输入不一致";
         return;
       }
-
-      //test
-      store.dispatch("login",{
-        username: username.value,
-        password: password.value,
-        success() {
-          router.push({name: 'home'});
-        },
-        error() {
-          error_message.value = "系统异常，请稍后重试"; 
-        }
-      })
       
 
       $.ajax({
-        url: "https://app165.acapp.acwing.com.cn/myspace/user/",
+        url: `${API_BASE_URL}/api/register`,
         type: "POST",
-        data: {
-          username: username.value,
-          password: password.value,
-          password_confirm: password_confirm.value,
-        },
+        contentType: "application/json",
+        data: JSON.stringify({
+                username: username.value,
+                password: password.value,
+        }),
         success(resp) {
-          if (resp.result === "success") {
+          if (resp.error_message === "success") {
             store.dispatch("login", {
               username: username.value,
               password: password.value,
               success() {
-                router.push({name: 'userlist'});
+                router.push({name: 'home'});
               },
               error() {
                 error_message.value = "系统异常，请稍后重试";
               }
             });
           } else {
-            error_message.value = resp.result;
+            error_message.value = resp.error_message;
           }
         }
       })

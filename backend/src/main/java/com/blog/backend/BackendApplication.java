@@ -6,7 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
-@MapperScan("com.blog.backend.mapper")
+//@MapperScan("com.blog.backend.mapper")
 @ComponentScan(basePackages = {"com.blog.backend", "com.blog.backend.util"})
 public class BackendApplication {
 
