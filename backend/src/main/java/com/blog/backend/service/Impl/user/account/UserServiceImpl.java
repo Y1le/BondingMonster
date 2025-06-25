@@ -2,17 +2,23 @@ package com.blog.backend.service.Impl.user.account;
 
 import com.blog.backend.entity.User;
 import com.blog.backend.mapper.UserMapper;
+import com.blog.backend.service.Impl.utils.UserDetailsImpl;
 import com.blog.backend.service.user.account.UserService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class UserServiceImpl implements UserService { // 实现 UserService 接口
 
     private final UserMapper userMapper;
-    // 如果 RedisUtil 在这个服务中没有直接使用，可以移除注入
-    // private final RedisUtil redisUtil;
+
 
     public UserServiceImpl(UserMapper userMapper /*, RedisUtil redisUtil*/) {
         this.userMapper = userMapper;
@@ -21,17 +27,38 @@ public class UserServiceImpl implements UserService { // 实现 UserService 接�
 
     /**
      * 根据用户ID获取用户信息
+     *
      * @param userId 用户ID
      * @return 用户对象
      */
     @Override // 标记为实现接口方法
-    public User getUserInfo(Long userId) {
+    public ResponseEntity<Map<String, String>> getUserInfo(Long userId) {
+        Map<String, String> map = new HashMap<>();
+        if (userId == 0) {
+            UsernamePasswordAuthenticationToken authentication =
+            (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+            UserDetailsImpl loginUser = (UserDetailsImpl) authentication.getPrincipal();
+            User user = loginUser.getUser();
+            map.put("id", user.getId().toString());
+            map.put("username", user.getUsername());
+            map.put("photo", user.getPhoto());
+            map.put("followerCount",user.getFollowerCount().toString());
+            return ResponseEntity.ok(map);
+        }
         User user = userMapper.selectById(userId);
+
         // 检查用户是否存在，避免空指针
         if (user != null) {
-            user.setPassword(null); // 清除密码信息，保护敏感数据
+            map.put("id", user.getId().toString());
+            map.put("username", user.getUsername());
+            map.put("photo", user.getPhoto());
+            map.put("followerCount",user.getFollowerCount().toString());
+            return ResponseEntity.ok(map);
         }
-        return user;
+        Map<String, String> errorResponse = new HashMap<>();
+        errorResponse.put("error", "User not found");
+        System.out.println(errorResponse);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
     }
 
     /**

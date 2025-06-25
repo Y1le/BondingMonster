@@ -28,10 +28,11 @@ export default {
     //     }
     //     $.ajax({
     //         url: `${API_BASE_URL}/api/article/put/`,
-    //         type: 'PUT',
-    //         data: {
-    //             content: content.value,
-    //         },  
+    //         type: 'post',
+            // contentType: "application/json", // <--- 明确指定 Content-Type
+            // data: JSON.stringify({
+            //     content: content.value,
+            // }),
     //         headers: {
     //           'Authorization': "Bearer " + store.state.user.access,
     //         },
@@ -42,6 +43,10 @@ export default {
     //             } else {
     //                 alert('发帖失败，请稍后再试。');
     //             }
+    //         },
+    //         error(error) {
+    //             console.log(error);
+    //             alert('发帖失败，请稍后再试。');
     //         },
     //       });
 

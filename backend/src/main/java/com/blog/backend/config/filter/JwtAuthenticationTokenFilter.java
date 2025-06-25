@@ -2,6 +2,7 @@ package com.blog.backend.config.filter;
 
 import com.blog.backend.entity.User;
 import com.blog.backend.mapper.UserMapper;
+import com.blog.backend.service.Impl.utils.UserDetailsImpl;
 import com.blog.backend.util.JwtUtil;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.ServletException;
@@ -49,8 +50,9 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
             throw new RuntimeException("用户名未登录");
         }
 
+        UserDetailsImpl loginUser = new UserDetailsImpl(user);
         UsernamePasswordAuthenticationToken authenticationToken =
-                new UsernamePasswordAuthenticationToken(user, null, null);
+                new UsernamePasswordAuthenticationToken(loginUser, null, null);
 
         SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 

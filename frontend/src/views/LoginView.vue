@@ -1,5 +1,5 @@
 <template>
-    <ContentBase>
+    <ContentBase v-if="!$store.state.user.pulling_info">
         <div class="row justify-content-md-center">
             <div class="col-3">
                 <form @submit.prevent="login">
@@ -35,6 +35,26 @@ export default {
         const username = ref('');
         const password = ref('');
         const error_message = ref('');
+
+        const jwt_token = localStorage.getItem("jwt_token");
+        if (jwt_token && jwt_token !== "undefined" && jwt_token !== "") {
+            console.log("jwt_token", jwt_token);
+            store.dispatch("refreshToken", {
+                refresh: jwt_token,
+                success: () => {
+                    
+                    console.log("ok?");
+                    store.commit("updatePullingInfo", true);
+                },
+                error: () => {
+                    localStorage.removeItem("jwt_token");
+                    store.commit("updatePullingInfo", true);
+                }
+            });
+            router.push({ name: 'home' });
+        }else {
+            store.commit("updatePullingInfo", false);
+        }
 
         const login = () => {
             error_message.value = '';

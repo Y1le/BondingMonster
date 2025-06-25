@@ -1,16 +1,20 @@
 package com.blog.backend.service.user.account; // 保持您原有的接口包路径
 
 import com.blog.backend.entity.User;
+import org.springframework.http.ResponseEntity;
+
 import java.util.List;
+import java.util.Map;
 
 public interface UserService {
 
     /**
      * 根据用户ID获取用户信息
+     *
      * @param userId 用户ID
      * @return 用户对象
      */
-    User getUserInfo(Long userId);
+    ResponseEntity<Map<String, String>> getUserInfo(Long userId);
 
     /**
      * 获取粉丝数排名前N的用户

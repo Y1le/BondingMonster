@@ -27,23 +27,8 @@ public class UserController {
      * Headers: Authorization: Bearer <access_token>
      */
     @GetMapping("/myspace/getinfo")
-    public ResponseEntity<Map<String, Object>> getUserInfo(@RequestParam("user_id") Long userId) {
-        User user = userService.getUserInfo(userId);
-        if (user != null) {
-            Map<String, Object> response = new HashMap<>();
-            response.put("id", user.getId());
-            response.put("username", user.getUsername());
-            response.put("photo", user.getPhoto());
-            response.put("followerCount", user.getFollowerCount());
-            // 注意：不要返回密码等敏感信息
-            System.out.println(response);
-            return ResponseEntity.ok(response);
-        } else {
-            Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("error", "User not found");
-            System.out.println(errorResponse);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
-        }
+    public ResponseEntity<Map<String, String>> getUserInfo(@RequestParam("user_id") Long userId) {
+        return userService.getUserInfo(userId);
     }
 
     /**

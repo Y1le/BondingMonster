@@ -41,6 +41,7 @@ export default {
     UserProfilePosts
   },
   setup() {
+
     const is_me = ref(true) // 示例数据
     const user = reactive({ id: 1, username: '当前用户' }) // 示例数据
     

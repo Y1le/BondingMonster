@@ -1,8 +1,9 @@
-package com.blog.backend.service.Impl.utils; // 建议放在这里
+package com.blog.backend.service.Impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper; // 假设您使用 MyBatis-Plus
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.blog.backend.entity.User;
 import com.blog.backend.mapper.UserMapper;
+import com.blog.backend.service.Impl.utils.UserDetailsImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -13,20 +14,17 @@ import org.springframework.stereotype.Service;
 public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Autowired
-    private UserMapper userMapper; // 注入您的 UserMapper
+    private UserMapper userMapper;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        // 从数据库中查找用户
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("username", username);
         User user = userMapper.selectOne(queryWrapper);
-
         if (user == null) {
-            throw new UsernameNotFoundException("用户不存在: " + username);
+            throw new RuntimeException("用户不存在");
         }
 
-        // 将查询到的 User 实体封装到 UserDetailsImpl 中并返回
         return new UserDetailsImpl(user);
     }
 }
