@@ -130,8 +130,8 @@ const ModuleUser = {
                 refresh,
             }),
             success(response) {
+                const {access, refresh} = response;
                 context.commit('updateAccess', response.access);
-                console.log("refreshToken success:", response.access);
                 $.ajax({
                     url: `${API_BASE_URL}/myspace/getinfo`,
                     type: "GET",
@@ -146,12 +146,13 @@ const ModuleUser = {
                         context.commit("updateUser", {
                             ...response,
                             randingCount: response.rankdingCount|0, 
-                            access: response.access,
+                            access: access,
                             refresh: refresh,
                             is_login: true,
                         });
                     },
                 })
+                console.log("refresh success", access);
             }
         });
     }

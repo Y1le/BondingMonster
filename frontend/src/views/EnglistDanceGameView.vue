@@ -17,7 +17,9 @@ export default {
     },
     setup() {
         const store = useStore();
-        const socketUrl = `ws://localhost:8080/websocket/${store.state.user.id}`;
+        const access = store.state.user.access;
+        console.log("access  ", access);
+        const socketUrl = `ws://localhost:8080/websocket/${access}`;
         store.commit("updateOppoent", {
             name: "等待对手",
             photo: "https://cdn.acwing.com/media/article/image/2022/08/09/1_1db2488f17-anonymous.png",
@@ -31,17 +33,18 @@ export default {
             socket.onopen = () => {
                 console.log("connected to websocket server");
                 store.commit("updateSocket", socket);
-                // console.log( socket);
             };
 
             socket.onmessage = msg => {
-                const data = JSON.parse(msg.date);
-                if (data.event === "matched") {
+                const data = JSON.parse(msg.data);
+                if (data.event === "start-game") {
                     store.commit("updateOppoent", {
-                        name: data.name,
-                        photo: data.photo,
+                        name: data.opponent_username,
+                        photo: data.opponent_photo,
                     });
-                    store.commit("updateStatus", "playing");
+                    setTimeout(() => {
+                        store.commit("updateStatus", "playing");
+                    }, 1000);
                 }
             };
 

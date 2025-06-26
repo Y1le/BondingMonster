@@ -4,7 +4,7 @@
             <div class="col-2 user-panel">
                 <div class="user-info">
                     <div class="user-photo">
-                        <img src="https://th.bing.com/th/id/OIP.H3ofruWZi8OgQskOyFmP9gAAAA?r=0&rs=1&pid=ImgDetMain&cb=idpwebp2&o=7&rm=3" alt="我的头像-加载失败">    
+                        <img :src="$store.state.user.photo" alt="我的头像-加载失败">    
                     </div>
                     <div class="user-name">{{ $store.state.user.name }}</div>
                     <div class="score">分数: {{ userScore }}</div>
@@ -18,13 +18,13 @@
                     <div v-for="(item, index) in option" :key="index" class="option-item">{{ item }}</div>
                 </div>
                 <div class="match-button-container">  
-                    <button  type="button" class="btn btn-primary btn-lg start-match-btn">开始匹配</button>
+                    <button  @click="click_match_btn" type="button" class="btn btn-primary btn-lg exit-match-btn">退出</button>
                 </div>
             </div>
             <div class="col-2 user-panel">
                 <div class="user-info">
                     <div class="user-photo">
-                        <img src="https://th.bing.com/th/id/OIP.H3ofruWZi8OgQskOyFmP9gAAAA?r=0&rs=1&pid=ImgDetMain&cb=idpwebp2&o=7&rm=3" alt="我的头像-加载失败">    
+                        <img :src="$store.state.englistdancegame.oppoent_photo" alt="我的头像-加载失败">    
                     </div>
                     <div class="user-name">{{ $store.state.englistdancegame.oppoent_name }}</div>
                     <div class="score">分数: {{ oppoentScore }}</div>
@@ -35,22 +35,25 @@
 </template>
 
 <script>
-import { useStore } from 'vuex';
 import { ref } from 'vue';
+import router from '@/router';
 export default {
     name: 'PlayGround',
     setup() {
-        const $store = useStore();
         const userScore = ref('0');
         const word = ref('ygl');
         const option = ref(['opt1', 'opt2', 'opt3', 'opt4']);
         const oppoentScore = ref('0');
+
+        const click_match_btn = () => {
+            router.push({ name: 'home' }); // 退出游戏后返回主页
+        }
         return {
-            $store,
             userScore,
             oppoentScore,
             word,
             option,
+            click_match_btn,
         };
     },
 };  
@@ -175,7 +178,7 @@ div.match-button-container {
     padding-top: 5vh; /* 调整按钮位置 */
 }
 
-.start-match-btn {
+.exit-match-btn {
     background-color: #1d3557; /* 深蓝色按钮 */
     border-color: #1d3557;
     color: #f1faee;
@@ -186,7 +189,7 @@ div.match-button-container {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-.start-match-btn:hover {
+.exit-match-btn:hover {
     background-color: #a8dadc; /* 悬停时变色 */
     border-color: #a8dadc;
     color: #1d3557;
@@ -218,7 +221,7 @@ div.match-button-container {
         font-size: 2rem;
         margin: 10px;
     }
-    .start-match-btn {
+    .exit-match-btn {
         font-size: 1.5rem;
         padding: 10px 30px;
     }
@@ -267,7 +270,7 @@ div.match-button-container {
         font-size: 1.8rem;
         margin: 8px;
     }
-    .start-match-btn {
+    .exit-match-btn {
         font-size: 1.2rem;
         padding: 8px 20px;
     }
